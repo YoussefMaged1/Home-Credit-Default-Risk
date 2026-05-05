@@ -1,0 +1,56 @@
+stages:
+  download:
+    cmd: uv run src/training/download_data.py
+    deps:
+      - src/training/download_data.py
+      - conf/config.yaml
+    outs:
+      - data/raw/
+
+  process:
+    cmd: uv run src/training/process_data.py
+    deps:
+      - src/training/process_data.py
+      - data/raw/
+      - conf/config.yaml
+    outs:
+      - data/processed/train.csv
+      - data/processed/test.csv
+
+  train:
+    cmd: uv run src/training/train.py
+    deps:
+      - src/training/train.py
+      - data/processed/train.csv
+      - data/processed/test.csv
+      - conf/config.yaml
+    outs:
+      - models/final_models_pipelines/xgb_model_pipeline.pkl
+      - models/final_models_pipelines/cbm_model_pipeline.pkl
+      - models/final_models_pipelines/xgb_oof.npy
+      - models/final_models_pipelines/cbm_oof.npy
+      - models/final_models_pipelines/y_train.npy
+    metrics:
+      - models/final_models_pipelines/xgb_metrics.json:
+          cache: false
+      - models/final_models_pipelines/cbm_metrics.json:
+          cache: false
+
+  evaluate:
+    cmd: uv run src/training/evaluate.py
+    deps:
+      - src/training/evaluate.py
+      - data/processed/train.csv
+      - models/final_models_pipelines/xgb_model_pipeline.pkl
+      - models/final_models_pipelines/cbm_model_pipeline.pkl
+      - models/final_models_pipelines/xgb_oof.npy
+      - models/final_models_pipelines/cbm_oof.npy
+      - models/final_models_pipelines/y_train.npy
+    metrics:
+      - reports/final_summary.json:
+          cache: false
+    plots:
+      - reports/confusion_matrix.png:
+          cache: false
+      - reports/feature_importance.png:
+          cache: false

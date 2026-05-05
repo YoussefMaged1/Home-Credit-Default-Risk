@@ -1,0 +1,136 @@
+schema: '2.0'
+stages:
+  download:
+    cmd: uv run src/training/download_data.py
+    deps:
+    - path: conf/config.yaml
+      hash: md5
+      md5: d0bd1c2921fd8190cf9518eaf71b00d3
+      size: 1548
+    - path: src/training/download_data.py
+      hash: md5
+      md5: 9b3dfaf2b398b12890c014f5077bc3cb
+      size: 1489
+    outs:
+    - path: data/raw/
+      hash: md5
+      md5: be145c3854454ad97fd16454f9aed966.dir
+      size: 2684261617
+      nfiles: 10
+  process:
+    cmd: uv run src/training/process_data.py
+    deps:
+    - path: conf/config.yaml
+      hash: md5
+      md5: d0bd1c2921fd8190cf9518eaf71b00d3
+      size: 1548
+    - path: data/raw/
+      hash: md5
+      md5: be145c3854454ad97fd16454f9aed966.dir
+      size: 2684261617
+      nfiles: 10
+    - path: src/training/process_data.py
+      hash: md5
+      md5: 117573642579dbc024ddc5ba49bfd6d9
+      size: 6262
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: f5f8af6e3c6fb910c7c5462bb2b9430c
+      size: 52280765
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 5f165d6fc6919bfb567ba8bf5f5a94b6
+      size: 323162648
+  train:
+    cmd: uv run src/training/train.py
+    deps:
+    - path: conf/config.yaml
+      hash: md5
+      md5: d0bd1c2921fd8190cf9518eaf71b00d3
+      size: 1548
+    - path: data/processed/test.csv
+      hash: md5
+      md5: f5f8af6e3c6fb910c7c5462bb2b9430c
+      size: 52280765
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 5f165d6fc6919bfb567ba8bf5f5a94b6
+      size: 323162648
+    - path: src/training/train.py
+      hash: md5
+      md5: 0295f3c3cdf315112c90d9cb02f30aac
+      size: 12888
+    outs:
+    - path: models/final_models_pipelines/cbm_metrics.json
+      hash: md5
+      md5: 1b2f03c7136d328967271575ed8b87a0
+      size: 441
+    - path: models/final_models_pipelines/cbm_model_pipeline.pkl
+      hash: md5
+      md5: a1797b4c21bd94fc573ffed350d37b0e
+      size: 2181464
+    - path: models/final_models_pipelines/cbm_oof.npy
+      hash: md5
+      md5: e165cfb443e14b067f4fa819b9451977
+      size: 2460216
+    - path: models/final_models_pipelines/xgb_metrics.json
+      hash: md5
+      md5: 5ba8a17eb643fddfb9bceeed25765cbb
+      size: 392
+    - path: models/final_models_pipelines/xgb_model_pipeline.pkl
+      hash: md5
+      md5: 9ce6842e3f8d267894ab40b4d98afa3d
+      size: 2239707
+    - path: models/final_models_pipelines/xgb_oof.npy
+      hash: md5
+      md5: a50487f5985fc9dddf1ce2c785560825
+      size: 2460216
+    - path: models/final_models_pipelines/y_train.npy
+      hash: md5
+      md5: f98f7225df433c36fa16a4632528c73f
+      size: 2460216
+  evaluate:
+    cmd: uv run src/training/evaluate.py
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 5f165d6fc6919bfb567ba8bf5f5a94b6
+      size: 323162648
+    - path: models/final_models_pipelines/cbm_model_pipeline.pkl
+      hash: md5
+      md5: a1797b4c21bd94fc573ffed350d37b0e
+      size: 2181464
+    - path: models/final_models_pipelines/cbm_oof.npy
+      hash: md5
+      md5: e165cfb443e14b067f4fa819b9451977
+      size: 2460216
+    - path: models/final_models_pipelines/xgb_model_pipeline.pkl
+      hash: md5
+      md5: 9ce6842e3f8d267894ab40b4d98afa3d
+      size: 2239707
+    - path: models/final_models_pipelines/xgb_oof.npy
+      hash: md5
+      md5: a50487f5985fc9dddf1ce2c785560825
+      size: 2460216
+    - path: models/final_models_pipelines/y_train.npy
+      hash: md5
+      md5: f98f7225df433c36fa16a4632528c73f
+      size: 2460216
+    - path: src/training/evaluate.py
+      hash: md5
+      md5: 96a8bd55c84f4840e24f3ad1a2ae66af
+      size: 4357
+    outs:
+    - path: reports/confusion_matrix.png
+      hash: md5
+      md5: 0d7064e9c58c0aec799da7135bbedd0d
+      size: 28766
+    - path: reports/feature_importance.png
+      hash: md5
+      md5: 0f06224f8a8175034c75ed49bf4559eb
+      size: 41612
+    - path: reports/final_summary.json
+      hash: md5
+      md5: 288aa49c75676c57fe0c88a27aad7634
+      size: 943
