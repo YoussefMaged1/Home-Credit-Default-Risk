@@ -197,3 +197,5 @@ reports/*/*.html
 reports/*/*.txt
 /models
 
+submissions
+main.py

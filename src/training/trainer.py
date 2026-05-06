@@ -1,8 +1,8 @@
-import setuptools
-import pkg_resources
-
-import sklearn
 import warnings
+
+import hydra
+import sklearn
+from omegaconf import DictConfig
 
 from src.logger import ExecutorLogger
 from src.training.download_data import download_Home_Credit_Default_Risk
@@ -10,8 +10,6 @@ from src.training.evaluate import main as evaluate
 from src.training.process_data import read_process_data
 from src.training.train import train_model
 
-import hydra
-from omegaconf import DictConfig
 
 @hydra.main(version_base=None, config_path="../../conf", config_name="config")
 def main(cfg: DictConfig) -> None:
@@ -20,11 +18,11 @@ def main(cfg: DictConfig) -> None:
 
     logger = ExecutorLogger("training")
     logger.info("Training started")
-    
+
     download_Home_Credit_Default_Risk(cfg)
     read_process_data(cfg, logger)
     train_model(cfg, logger)
-    evaluate(cfg, logger)  
+    evaluate(cfg, logger)
     logger.info("Training finished")
 
 

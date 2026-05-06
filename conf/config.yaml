@@ -73,4 +73,12 @@ artifacts:
   report_path: "reports"
   logs_path: "logs"
 
+model:
+  repo_name: "Home-Credit-Default-Risk"
+  use_mlflow: true
+
 threshold: 0.25
+
+model_weights:
+  xgboost: 0.3
+  catboost: 0.7

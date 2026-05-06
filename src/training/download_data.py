@@ -1,17 +1,20 @@
+import logging
 import os
 import shutil
-import kagglehub
+
 import hydra
-from omegaconf import DictConfig
-from hydra.utils import get_original_cwd
+import kagglehub
 from dotenv import load_dotenv
-import logging
+from hydra.utils import get_original_cwd
+from omegaconf import DictConfig
+
 
 @hydra.main(version_base=None, config_path="../../conf", config_name="config")
 def download_Home_Credit_Default_Risk(cfg: DictConfig):
     logger = logging.getLogger(__name__)
-    
+
     download_Home_Credit_Default_Risk_data(cfg, logger)
+
 
 def download_Home_Credit_Default_Risk_data(cfg: DictConfig, logger) -> str:
     logger.info(f"Downloading {cfg.data.competition_name} dataset from Kaggle...")
@@ -39,6 +42,7 @@ def download_Home_Credit_Default_Risk_data(cfg: DictConfig, logger) -> str:
 
     logger.info(f"Dataset downloaded and copied to {raw_data_dir}")
     return raw_data_dir
+
 
 if __name__ == "__main__":
     download_Home_Credit_Default_Risk()
