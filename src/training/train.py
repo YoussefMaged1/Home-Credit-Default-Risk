@@ -220,8 +220,8 @@ def train_model(cfg, logger) -> None:
 
                 mlflow.log_params(XGB_study.best_params)
                 mlflow.log_params(cfg.xgboost.static_params)
-                mlflow.log_params("n_folds", cfg.training.n_folds)
-                mlflow.log_params("blending_weight", cfg.model_weights.xgboost)
+                mlflow.log_params({"n_folds": cfg.training.n_folds})
+                mlflow.log_params({"blending_weight": cfg.model_weights.xgboost})
                 mlflow.log_metric("overall_auc", final_auc)
                 mlflow.sklearn.log_model(XGB_full_pipeline, "xgb_pipeline")
 
@@ -407,9 +407,8 @@ def train_model(cfg, logger) -> None:
 
                 mlflow.log_params(CBM_study.best_params)
                 mlflow.log_params(cfg.catboost.static_params)
-                mlflow.log_params("n_folds", cfg.training.n_folds)
-                mlflow.log_params("blending_weight", cfg.model_weights.catboost)
-
+                mlflow.log_params({"n_folds": cfg.training.n_folds})
+                mlflow.log_params({"blending_weight": cfg.model_weights.catboost})
                 mlflow.log_metric("overall_auc", final_auc)
                 mlflow.sklearn.log_model(CBM_full_pipeline, "cbm_pipeline")
 

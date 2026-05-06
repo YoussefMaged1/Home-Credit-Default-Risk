@@ -54,3 +54,12 @@ stages:
           cache: false
       - reports/feature_importance.png:
           cache: false
+  
+  inference:
+    cmd: uv run src/training/inference.py
+    deps:
+      - src/training/inference.py
+      - data/processed/test.csv
+      - conf/config.yaml
+    outs:
+      - submissions/submission.csv
