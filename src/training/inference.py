@@ -16,7 +16,6 @@ dagshub.init(
     mlflow=True,
 )
 
-# Load Models
 xgb_model = mlflow.sklearn.load_model("models:/home-credit-ensemble_xgb@production")
 cbm_model = mlflow.sklearn.load_model("models:/home-credit-ensemble_cbm@production")
 

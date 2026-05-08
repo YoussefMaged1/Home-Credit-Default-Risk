@@ -147,10 +147,10 @@ stages:
       size: 52621984
     - path: src/training/inference.py
       hash: md5
-      md5: f2af932336809d6aa94c777a55d5b546
-      size: 1506
+      md5: 59a2d9077873c5ed4aca90aec604fb31
+      size: 1491
     outs:
     - path: submissions/submission.csv
       hash: md5
-      md5: 841683d7b6b303a6aeeaed1587d251be
-      size: 1356577
+      md5: a3e8c304092b5a41cd57f4f884a9626e
+      size: 1337074
