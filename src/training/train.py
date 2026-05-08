@@ -436,7 +436,7 @@ def train_model(cfg, logger) -> None:
         ensemble_auc = roc_auc_score(y_train, ensemble_oof_preds)
         mlflow.log_metric("overall_auc", ensemble_auc)
         mlflow.log_metric("threshold", cfg.threshold)
-        
+
         logger.info(
             f"Final Ensemble AUC ({cfg.model_weights.xgboost * 100:.0f}/{cfg.model_weights.catboost * 100:.0f}): {ensemble_auc:.5f}"
         )
