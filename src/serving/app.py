@@ -206,7 +206,7 @@ class HomeCreditAPI(ls.LitAPI):
         for i, score in enumerate(preds):
             record = {
                 "default_probability": round(float(score), 4),
-                "prediction": "NO DEFAULT" if score > self.threshold else "DEFAULT",
+                "prediction": "DEFAULT" if score > self.threshold else "NO DEFAULT",
             }
             if self.sk_ids:
                 record["SK_ID_CURR"] = int(self.sk_ids[i])

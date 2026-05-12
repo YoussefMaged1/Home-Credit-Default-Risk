@@ -274,7 +274,7 @@ tasks.
 Predictions are written back to MotherDuck so downstream tools can query the
 latest default probabilities and labels.
 
-![MotherDuck predictions table](docs/assests/image-2.png)
+![MotherDuck predictions table](docs/assests/image-2.jpeg)
 
 ## API Serving
 
@@ -311,7 +311,7 @@ Example response:
 The API can score an applicant through a `POST /predict` request and return both
 the default probability and the final threshold-based label.
 
-![Successful API prediction request](docs/assests/image-3.png)
+![Successful API prediction request](docs/assests/image-3.jpeg)
 
 ## Reproducibility
 
@@ -340,6 +340,39 @@ Run the full pipeline:
 ```bash
 dvc repro
 ```
+
+## Docker
+
+The project includes a `Dockerfile` so the environment can be reproduced in CI/CD
+or deployed as a containerized prediction service.
+
+Build the image:
+
+```bash
+docker build -t home-credit-default-risk .
+```
+
+Run the API service:
+
+```bash
+docker run --rm -p 8000:8000 --env-file .env home-credit-default-risk
+```
+
+The default container command starts the LitServe API:
+
+```bash
+uv run python -m src.serving.app
+```
+
+For pipeline jobs, override the container command:
+
+```bash
+docker run --rm --env-file .env home-credit-default-risk uv run main.py --mode evaluate
+```
+
+The `.dockerignore` file excludes local data, model artifacts, virtual
+environments, logs, secrets, and CatBoost training output so the image stays
+smaller and safer for CI/CD.
 
 ## Configuration
 

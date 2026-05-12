@@ -103,7 +103,7 @@ def save_predictions(cfg, sk_ids, preds):
             "SK_ID_CURR": sk_ids,
             "TARGET": preds,
             "PREDICTION": [
-                "NO DEFAULT" if p > cfg.threshold else "DEFAULT" for p in preds
+                "DEFAULT" if p > cfg.threshold else "NO DEFAULT" for p in preds
             ],
         }
     )
