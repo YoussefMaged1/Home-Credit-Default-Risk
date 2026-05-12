@@ -5,13 +5,13 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-    workflow_dispatch:
 
 env:
   IMAGE_NAME: home-credit-risk
   DOCKERHUB_USERNAME: youssefmaged237
 
 jobs:
+  # ── Stage 1: Test ─────────────────────────────────────────────────────────
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -33,6 +33,7 @@ jobs:
       - name: Run lint
         run: bash scripts/lint.sh
 
+  # ── Stage 2: Build ────────────────────────────────────────────────────────
   build:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
@@ -88,6 +89,7 @@ jobs:
             ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.short_sha }}
             ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
+  # ── Stage 3: Deploy ───────────────────────────────────────────────────────
   deploy:
     name: Deploy to Lightning AI
     runs-on: ubuntu-latest
@@ -117,4 +119,7 @@ jobs:
           TEAMSPACE: ${{ secrets.TEAMSPACE }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
+          DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }}
         run: uv run python deploy.py
