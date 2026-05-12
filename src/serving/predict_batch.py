@@ -54,7 +54,7 @@ def transform_data(test_df, bureau, prev, ins):
     df = df.merge(prev_df, on="SK_ID_CURR", how="left")
     df = df.merge(ins_df, on="SK_ID_CURR", how="left")
     df = df.drop(columns=["SK_ID_CURR"], errors="ignore")
-    df = apply_feature_engineering(df)    
+    df = apply_feature_engineering(df)
 
     return df, sk_ids
 

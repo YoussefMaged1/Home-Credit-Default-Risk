@@ -1894,6 +1894,29 @@ wheels = [
 ]
 
 [[package]]
+name = "lightning-sdk"
+version = "2026.5.6.post2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "backoff" },
+    { name = "click" },
+    { name = "docker" },
+    { name = "fastapi" },
+    { name = "packaging" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "rich" },
+    { name = "simple-term-menu" },
+    { name = "six" },
+    { name = "tqdm" },
+    { name = "urllib3" },
+    { name = "uvicorn" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/aa/7e/2bf511da745fce49addba3532a02d5e6929e66eb2969d40179f9135dc68b/lightning_sdk-2026.5.6.post2-py3-none-any.whl", hash = "sha256:6805d596c8bd624e1673cbdcbaf94525aa1ceba90057ce566b89e20ad2676f3c", size = 3009597, upload-time = "2026-05-06T18:25:36.224Z" },
+]
+
+[[package]]
 name = "litserve"
 version = "0.2.17"
 source = { registry = "https://pypi.org/simple" }
@@ -2087,6 +2110,7 @@ dependencies = [
     { name = "hydra-core" },
     { name = "joblib" },
     { name = "kagglehub" },
+    { name = "lightning-sdk" },
     { name = "litserve" },
     { name = "loguru" },
     { name = "matplotlib" },
@@ -2120,6 +2144,7 @@ requires-dist = [
     { name = "hydra-core", specifier = ">=1.3.2" },
     { name = "joblib", specifier = ">=1.5.3" },
     { name = "kagglehub", specifier = ">=1.0.1" },
+    { name = "lightning-sdk", specifier = ">=2026.5.6.post2" },
     { name = "litserve", specifier = ">=0.2.17" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "matplotlib", specifier = ">=3.10.9" },
@@ -3629,6 +3654,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b0/7a/7f131b6082d8b592c32e4312d0a6da3d0b28b8f0d305ddd93e49c9d89929/shtab-1.8.0.tar.gz", hash = "sha256:75f16d42178882b7f7126a0c2cb3c848daed2f4f5a276dd1ded75921cc4d073a", size = 46062, upload-time = "2025-11-18T10:57:47.601Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8e/e1/202a31727b0d096a04380f78e809074d7a1d0a22d9d5a39fea1d2353fd02/shtab-1.8.0-py3-none-any.whl", hash = "sha256:f0922a82174b4007e06ac0bac4f79abd826c5cca88e201bfd927f889803c571d", size = 14457, upload-time = "2025-11-18T10:57:45.906Z" },
+]
+
+[[package]]
+name = "simple-term-menu"
+version = "1.6.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d8/80/f0f10b4045628645a841d3d98b584a8699005ee03a211fc7c45f6c6f0e99/simple_term_menu-1.6.6.tar.gz", hash = "sha256:9813d36f5749d62d200a5599b1ec88469c71378312adc084c00c00bfbb383893", size = 35493, upload-time = "2024-12-02T16:31:50.639Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9c/09/21d993e394c1fe5c44cd90453d88ed44932da8dfca006e424c072d77d29b/simple_term_menu-1.6.6-py3-none-any.whl", hash = "sha256:c2a869efa7a9f7e4a9c25858b42ca6974034951c137d5e281f5339b06ed8c9c2", size = 27600, upload-time = "2024-12-02T16:31:48.934Z" },
 ]
 
 [[package]]

@@ -31,9 +31,21 @@ stages:
       nfiles: 10
     - path: src/training/process_data.py
       hash: md5
-      md5: e9d04aee4d58059b2434a5af410103d6
-      size: 6135
+      md5: bcaba57069bf387ec0f666d3745dce69
+      size: 6355
     outs:
+    - path: data/processed/bureau_features.csv
+      hash: md5
+      md5: 61b26d2d7c6c633df957737da9cca87e
+      size: 31419949
+    - path: data/processed/installments_features.csv
+      hash: md5
+      md5: ae5890df473f989bdf7cbe91db23c00b
+      size: 35014588
+    - path: data/processed/prev_features.csv
+      hash: md5
+      md5: 8ad6446866887d1dcb84e7e0266b8077
+      size: 39295421
     - path: data/processed/test.csv
       hash: md5
       md5: 6ddc089e65590555f7397e69b954138b

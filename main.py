@@ -57,7 +57,7 @@ def run_script(stage: str) -> None:
     logger.info(f"▶ Starting stage: {stage.upper()}")
     result = subprocess.run(
         ["uv", "run", str(script)],
-        check=False,  
+        check=False,
     )
 
     if result.returncode != 0:

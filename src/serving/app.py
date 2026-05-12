@@ -12,9 +12,6 @@ from pydantic import BaseModel
 
 from src.training.process_data import (
     apply_feature_engineering,
-    get_bureau_features,
-    get_installments_features,
-    get_prev_apps_features,
 )
 
 
@@ -171,16 +168,9 @@ class HomeCreditAPI(ls.LitAPI):
             "models:/home-credit-ensemble_cbm@production"
         )
 
-        RAW = "data/raw"
-
-        bureau = pd.read_csv(os.path.join(RAW, "bureau.csv"))
-        self.bureau_df = get_bureau_features(bureau)
-
-        prev = pd.read_csv(os.path.join(RAW, "previous_application.csv"))
-        self.prev_df = get_prev_apps_features(prev)
-
-        ins = pd.read_csv(os.path.join(RAW, "installments_payments.csv"))
-        self.ins_df = get_installments_features(ins)
+        self.bureau_df = pd.read_csv("data/processed/bureau_features.csv")
+        self.prev_df = pd.read_csv("data/processed/prev_features.csv")
+        self.ins_df = pd.read_csv("data/processed/installments_features.csv")
 
     def decode_request(self, request: PredictRequest):
         df = pd.DataFrame([a.model_dump() for a in request.applicants])

@@ -16,6 +16,9 @@ stages:
     outs:
       - data/processed/train.csv
       - data/processed/test.csv
+      - data/processed/bureau_features.csv
+      - data/processed/prev_features.csv
+      - data/processed/installments_features.csv
 
   train:
     cmd: uv run src/training/train.py

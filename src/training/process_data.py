@@ -122,10 +122,14 @@ def read_process_data(config, logger) -> None:
     logger.info("Extracting features from other tables...")
     bureau = pd.read_csv(os.path.join(SOURCE, "bureau.csv"))
     bureau_df = get_bureau_features(bureau)
+    bureau_df.to_csv("data/processed/bureau_features.csv", index=False)
+
     prev = pd.read_csv(os.path.join(SOURCE, "previous_application.csv"))
     prev_df = get_prev_apps_features(prev)
+    prev_df.to_csv("data/processed/prev_features.csv", index=False)
     ins = pd.read_csv(os.path.join(SOURCE, "installments_payments.csv"))
     ins_df = get_installments_features(ins)
+    ins_df.to_csv("data/processed/installments_features.csv", index=False)
 
     logger.info("Merging all tables...")
     df_sample = pd.read_csv(os.path.join(SOURCE, "application_train.csv"))

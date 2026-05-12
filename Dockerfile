@@ -24,6 +24,7 @@ COPY conf ./conf
 COPY src ./src
 COPY main.py ./main.py
 COPY dvc.yaml dvc.lock ./
+COPY data/processed ./data/processed
 
 EXPOSE 8000
 

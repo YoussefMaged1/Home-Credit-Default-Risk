@@ -426,6 +426,3 @@ of a machine learning system:
 - Versioning pipelines and artifacts
 - Producing evaluation reports
 - Serving predictions through both batch and API workflows
-
-For a data science portfolio, this project shows the ability to build, organize,
-and ship a complete machine learning workflow rather than stopping at a notebook.
