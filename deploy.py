@@ -32,6 +32,13 @@ runtime_env = [
 try:
     deployment.update(image=image, ports=[8000], env=runtime_env)
     print(f"✅ Deployment updated with image: {image}")
+    if deployment.is_stopped:
+        deployment.start(
+            image=image,
+            ports=[8000],
+            env=runtime_env,
+        )
+        print(f"✅ Deployment restarted with image: {image}")
 except Exception:
     deployment.start(
         image=image,
