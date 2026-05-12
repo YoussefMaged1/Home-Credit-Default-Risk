@@ -321,6 +321,7 @@ This project uses:
 - `Hydra` for configuration
 - `DVC` for pipeline orchestration and artifact tracking
 - `MLflow` for experiment and model tracking
+- `GitHub Actions` for linting, Docker image builds, and deployment
 - `.env.example` for required secrets
 
 Install dependencies:
@@ -345,6 +346,18 @@ dvc repro
 
 The project includes a `Dockerfile` so the environment can be reproduced in CI/CD
 or deployed as a containerized prediction service.
+
+The API image expects the processed feature files used at serving time:
+
+- `data/processed/bureau_features.csv`
+- `data/processed/prev_features.csv`
+- `data/processed/installments_features.csv`
+
+These files are versioned with DVC. Pull them before building locally:
+
+```bash
+uv run dvc pull
+```
 
 Build the image:
 
@@ -373,6 +386,35 @@ docker run --rm --env-file .env home-credit-default-risk uv run main.py --mode e
 The `.dockerignore` file excludes local data, model artifacts, virtual
 environments, logs, secrets, and CatBoost training output so the image stays
 smaller and safer for CI/CD.
+
+## CI/CD
+
+GitHub Actions runs the CI/CD workflow in `.github/workflows/ci-cd.yml`.
+
+On pull requests to `main`, the workflow runs lint and format checks with
+`ruff`.
+
+On pushes to `main`, the workflow:
+
+1. Runs lint and format checks
+2. Configures the DVC remote on DagsHub
+3. Pulls DVC-tracked serving data
+4. Builds and pushes the Docker image to Docker Hub
+5. Deploys the pushed image to Lightning AI
+
+Required GitHub repository secrets:
+
+```text
+DAGSHUB_USERNAME
+DAGSHUB_TOKEN
+DOCKERHUB_USERNAME
+DOCKERHUB_TOKEN
+LIGHTNING_USERNAME
+LIGHTNING_API_KEY
+TEAMSPACE
+```
+
+The pushed Docker image is tagged with both the short commit SHA and `latest`.
 
 ## Configuration
 
@@ -408,8 +450,7 @@ For CPU-only environments, change these settings before training.
 - Add schema validation for raw and processed datasets
 - Add calibration analysis for predicted probabilities
 - Add model explainability reports using SHAP
-- Add Docker support for easier deployment
-- Add CI checks for linting, formatting, and pipeline smoke tests
+- Add pipeline smoke tests to CI
 - Compare against a simple baseline model to show lift from feature engineering
 
 ## Why This Project Matters
