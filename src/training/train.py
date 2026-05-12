@@ -102,9 +102,7 @@ def XGB_pipeline(
                 ),
             }
 
-            skf_opt = StratifiedKFold(
-                n_splits=3, shuffle=True, random_state=cfg.training.random_seed
-            )
+            skf_opt = StratifiedKFold(n_splits=3, shuffle=True, random_state=cfg.training.random_seed)
             scores = []
             for t_idx, v_idx in skf_opt.split(X_train, y_train):
                 xt, xv = X_train.iloc[t_idx], X_train.iloc[v_idx]
@@ -167,20 +165,14 @@ def XGB_pipeline(
             )
 
             XGB_oof_preds[val_idx] = XGB_full_pipeline.predict_proba(X_fold_val)[:, 1]
-            XGB_test_preds_total += (
-                XGB_full_pipeline.predict_proba(X_test)[:, 1] / cfg.training.n_folds
-            )
+            XGB_test_preds_total += XGB_full_pipeline.predict_proba(X_test)[:, 1] / cfg.training.n_folds
             logger.info(f"✅ Fold {fold + 1} Done!")
 
         logger.info(f"XGB Overall AUC: {roc_auc_score(y_train, XGB_oof_preds):.5f}")
 
         os.makedirs(SAVE_PATH, exist_ok=True)
-        joblib.dump(
-            XGB_full_pipeline, os.path.join(SAVE_PATH, "xgb_model_pipeline.pkl")
-        )
-        logger.info(
-            f"XGB model pipeline saved to {os.path.join(SAVE_PATH, 'xgb_model_pipeline.pkl')}"
-        )
+        joblib.dump(XGB_full_pipeline, os.path.join(SAVE_PATH, "xgb_model_pipeline.pkl"))
+        logger.info(f"XGB model pipeline saved to {os.path.join(SAVE_PATH, 'xgb_model_pipeline.pkl')}")
 
         final_auc = float(roc_auc_score(y_train, XGB_oof_preds))
 
@@ -202,9 +194,7 @@ def XGB_pipeline(
         with open(os.path.join(SAVE_PATH, "xgb_metrics.json"), "w") as f:
             json.dump(xgb_meta, f, indent=4)
 
-        logger.info(
-            f"XGB Metrics saved to {os.path.join(SAVE_PATH, 'xgb_metrics.json')}"
-        )
+        logger.info(f"XGB Metrics saved to {os.path.join(SAVE_PATH, 'xgb_metrics.json')}")
         return XGB_oof_preds, XGB_test_preds_total
 
 
@@ -283,9 +273,7 @@ def CBM_pipeline(
                 ),
             }
 
-            skf_opt = StratifiedKFold(
-                n_splits=3, shuffle=True, random_state=cfg.training.random_seed
-            )
+            skf_opt = StratifiedKFold(n_splits=3, shuffle=True, random_state=cfg.training.random_seed)
             scores = []
             for t_idx, v_idx in skf_opt.split(X_train, y_train):
                 xt, xv = X_train.iloc[t_idx], X_train.iloc[v_idx]
@@ -354,20 +342,14 @@ def CBM_pipeline(
             )
 
             CBM_oof_preds[val_idx] = CBM_full_pipeline.predict_proba(X_fold_val)[:, 1]
-            CBM_test_preds_total += (
-                CBM_full_pipeline.predict_proba(X_test)[:, 1] / cfg.training.n_folds
-            )
+            CBM_test_preds_total += CBM_full_pipeline.predict_proba(X_test)[:, 1] / cfg.training.n_folds
             logger.info(f"CBM Fold {fold + 1} Done!")
 
         logger.info(f"CBM Overall AUC: {roc_auc_score(y_train, CBM_oof_preds):.5f}")
 
         os.makedirs(SAVE_PATH, exist_ok=True)
-        joblib.dump(
-            CBM_full_pipeline, os.path.join(SAVE_PATH, "cbm_model_pipeline.pkl")
-        )
-        logger.info(
-            f"CBM model pipeline saved to {os.path.join(SAVE_PATH, 'cbm_model_pipeline.pkl')}"
-        )
+        joblib.dump(CBM_full_pipeline, os.path.join(SAVE_PATH, "cbm_model_pipeline.pkl"))
+        logger.info(f"CBM model pipeline saved to {os.path.join(SAVE_PATH, 'cbm_model_pipeline.pkl')}")
 
         final_auc = float(roc_auc_score(y_train, CBM_oof_preds))
 
@@ -389,9 +371,7 @@ def CBM_pipeline(
         with open(os.path.join(SAVE_PATH, "cbm_metrics.json"), "w") as f:
             json.dump(cbm_meta, f, indent=4)
 
-        logger.info(
-            f"CBM Metrics saved to {os.path.join(SAVE_PATH, 'cbm_metrics.json')}"
-        )
+        logger.info(f"CBM Metrics saved to {os.path.join(SAVE_PATH, 'cbm_metrics.json')}")
         return CBM_oof_preds, CBM_test_preds_total
 
 
@@ -452,16 +432,14 @@ def train_model(cfg, logger) -> None:
             cfg,
             logger,
         )
-        ensemble_oof_preds = (cfg.model_weights.xgboost * xgb_oof) + (
-            cfg.model_weights.catboost * cbm_oof
-        )
+        ensemble_oof_preds = (cfg.model_weights.xgboost * xgb_oof) + (cfg.model_weights.catboost * cbm_oof)
         ensemble_auc = roc_auc_score(y_train, ensemble_oof_preds)
         mlflow.log_metric("overall_auc", ensemble_auc)
         mlflow.log_metric("threshold", cfg.threshold)
 
-    logger.info(
-        f"Final Ensemble AUC ({cfg.model_weights.xgboost * 100:.0f}/{cfg.model_weights.catboost * 100:.0f}): {ensemble_auc:.5f}"
-    )
+    xgb_w = cfg.model_weights.xgboost * 100
+    cbm_w = cfg.model_weights.catboost * 100
+    logger.info(f"Final Ensemble AUC ({xgb_w:.0f}/{cbm_w:.0f}): {ensemble_auc:.5f}")
 
     np.save(os.path.join(SAVE_PATH, "xgb_oof.npy"), xgb_oof)
     np.save(os.path.join(SAVE_PATH, "cbm_oof.npy"), cbm_oof)

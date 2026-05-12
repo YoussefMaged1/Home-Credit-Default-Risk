@@ -84,9 +84,7 @@ def predict(cfg, df: pd.DataFrame):
 
     xgb_preds = xgb_model.predict_proba(df)[:, 1]
     cbm_preds = cbm_model.predict_proba(df)[:, 1]
-    ensemble_preds = (cfg.model_weights.xgboost * xgb_preds) + (
-        cfg.model_weights.catboost * cbm_preds
-    )
+    ensemble_preds = (cfg.model_weights.xgboost * xgb_preds) + (cfg.model_weights.catboost * cbm_preds)
 
     return ensemble_preds
 
@@ -102,9 +100,7 @@ def save_predictions(cfg, sk_ids, preds):
         {
             "SK_ID_CURR": sk_ids,
             "TARGET": preds,
-            "PREDICTION": [
-                "DEFAULT" if p > cfg.threshold else "NO DEFAULT" for p in preds
-            ],
+            "PREDICTION": ["DEFAULT" if p > cfg.threshold else "NO DEFAULT" for p in preds],
         }
     )
 

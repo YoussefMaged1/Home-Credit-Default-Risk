@@ -2,7 +2,7 @@
 set -e
 
 echo "Running ruff check..."
-uv run ruff check src/
+uv run ruff check src/ --ignore E501
 
 echo "Running ruff format check..."
 uv run ruff format --check src/

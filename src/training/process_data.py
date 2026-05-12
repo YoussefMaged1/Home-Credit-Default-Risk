@@ -15,13 +15,11 @@ def get_bureau_features(bureau: pd.DataFrame):
         }
     )
 
-    bureau_agg.columns = pd.Index(
-        ["BUREAU_" + e[0] + "_" + e[1].upper() for e in bureau_agg.columns.tolist()]
-    )
+    bureau_agg.columns = pd.Index(["BUREAU_" + e[0] + "_" + e[1].upper() for e in bureau_agg.columns.tolist()])
 
-    bureau_agg["BUREAU_DEBT_CREDIT_RATIO"] = bureau_agg[
-        "BUREAU_AMT_CREDIT_SUM_DEBT_SUM"
-    ] / (bureau_agg["BUREAU_AMT_CREDIT_SUM_SUM"] + 1e-6)
+    bureau_agg["BUREAU_DEBT_CREDIT_RATIO"] = bureau_agg["BUREAU_AMT_CREDIT_SUM_DEBT_SUM"] / (
+        bureau_agg["BUREAU_AMT_CREDIT_SUM_SUM"] + 1e-6
+    )
 
     bureau_agg["BUREAU_LOAN_COUNT"] = bureau.groupby("SK_ID_CURR").size()
 
@@ -39,16 +37,10 @@ def get_prev_apps_features(prev: pd.DataFrame):
             "CNT_PAYMENT": ["mean", "sum"],
         }
     )
-    prev_agg.columns = pd.Index(
-        ["PREV_" + e[0] + "_" + e[1].upper() for e in prev_agg.columns.tolist()]
-    )
+    prev_agg.columns = pd.Index(["PREV_" + e[0] + "_" + e[1].upper() for e in prev_agg.columns.tolist()])
 
-    prev_agg["PREV_APPROVED_COUNT"] = (
-        prev[prev["NAME_CONTRACT_STATUS"] == "Approved"].groupby("SK_ID_CURR").size()
-    )
-    prev_agg["PREV_REFUSED_COUNT"] = (
-        prev[prev["NAME_CONTRACT_STATUS"] == "Refused"].groupby("SK_ID_CURR").size()
-    )
+    prev_agg["PREV_APPROVED_COUNT"] = prev[prev["NAME_CONTRACT_STATUS"] == "Approved"].groupby("SK_ID_CURR").size()
+    prev_agg["PREV_REFUSED_COUNT"] = prev[prev["NAME_CONTRACT_STATUS"] == "Refused"].groupby("SK_ID_CURR").size()
     prev_agg = prev_agg.fillna(0)
 
     return prev_agg.reset_index()
@@ -70,9 +62,7 @@ def get_installments_features(installments: pd.DataFrame):
             "DAYS_ENTRY_PAYMENT": ["max", "mean"],
         }
     )
-    ins_agg.columns = pd.Index(
-        ["INS_" + e[0] + "_" + e[1].upper() for e in ins_agg.columns.tolist()]
-    )
+    ins_agg.columns = pd.Index(["INS_" + e[0] + "_" + e[1].upper() for e in ins_agg.columns.tolist()])
 
     return ins_agg.reset_index()
 
@@ -91,12 +81,8 @@ def apply_feature_engineering(df):
     df["INCOME_CREDIT_PERC"] = df["AMT_INCOME_TOTAL"] / df["AMT_CREDIT"]
     df["INCOME_PER_PERSON"] = df["AMT_INCOME_TOTAL"] / df["CNT_FAM_MEMBERS"]
     df["DAYS_EMPLOYED_PERC"] = df["DAYS_EMPLOYED"] / df["DAYS_BIRTH"]
-    df["EXT_SOURCES_PROD"] = (
-        df["EXT_SOURCE_1"] * df["EXT_SOURCE_2"] * df["EXT_SOURCE_3"]
-    )
-    df["EXT_SOURCES_STD"] = df[["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3"]].std(
-        axis=1
-    )
+    df["EXT_SOURCES_PROD"] = df["EXT_SOURCE_1"] * df["EXT_SOURCE_2"] * df["EXT_SOURCE_3"]
+    df["EXT_SOURCES_STD"] = df[["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3"]].std(axis=1)
     df["CREDIT_ANNUITY_RATIO"] = df["AMT_CREDIT"] / df["AMT_ANNUITY"]
     df["CREDIT_GOODS_RATIO"] = df["AMT_CREDIT"] / df["AMT_GOODS_PRICE"]
     df["INCOME_ANNUITY_CHUNKS"] = df["AMT_INCOME_TOTAL"] / df["AMT_ANNUITY"]
@@ -105,12 +91,8 @@ def apply_feature_engineering(df):
     df["AGE_INT"] = (df["DAYS_BIRTH"] / -365).astype(int)
     df["EXT_SOURCE_1_OVER_3"] = df["EXT_SOURCE_1"] / (df["EXT_SOURCE_3"] + 1e-6)
     df["EXT_SOURCE_2_OVER_3"] = df["EXT_SOURCE_2"] / (df["EXT_SOURCE_3"] + 1e-6)
-    df["EXT_SOURCES_SUM"] = df[["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3"]].sum(
-        axis=1
-    )
-    df["EXT_SOURCES_MEAN"] = df[["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3"]].mean(
-        axis=1
-    )
+    df["EXT_SOURCES_SUM"] = df[["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3"]].sum(axis=1)
+    df["EXT_SOURCES_MEAN"] = df[["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3"]].mean(axis=1)
     return df
 
 

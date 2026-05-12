@@ -144,7 +144,6 @@ class PredictRequest(BaseModel):
 
 
 class HomeCreditAPI(ls.LitAPI):
-
     def setup(self, device):
         cfg = OmegaConf.load("conf/config.yaml")
 
@@ -161,12 +160,8 @@ class HomeCreditAPI(ls.LitAPI):
             mlflow=True,
         )
 
-        self.xgb_model = mlflow.sklearn.load_model(
-            "models:/home-credit-ensemble_xgb@production"
-        )
-        self.cbm_model = mlflow.sklearn.load_model(
-            "models:/home-credit-ensemble_cbm@production"
-        )
+        self.xgb_model = mlflow.sklearn.load_model("models:/home-credit-ensemble_xgb@production")
+        self.cbm_model = mlflow.sklearn.load_model("models:/home-credit-ensemble_cbm@production")
 
         self.bureau_df = pd.read_csv("data/processed/bureau_features.csv")
         self.prev_df = pd.read_csv("data/processed/prev_features.csv")

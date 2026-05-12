@@ -25,21 +25,18 @@ def evaluate_models(cfg: DictConfig, logger):
         xgb_oof = np.load(os.path.join(SAVE_PATH, "xgb_oof.npy"))
         cbm_oof = np.load(os.path.join(SAVE_PATH, "cbm_oof.npy"))
     except FileNotFoundError:
-        logger.error(
-            "OOF files not found! Make sure to save y_train, xgb_oof, and cbm_oof in train.py"
-        )
+        logger.error("OOF files not found! Make sure to save y_train, xgb_oof, and cbm_oof in train.py")
         return
 
-    ensemble_oof_preds = (cfg.model_weights.xgboost * xgb_oof) + (
-        cfg.model_weights.catboost * cbm_oof
-    )
+    ensemble_oof_preds = (cfg.model_weights.xgboost * xgb_oof) + (cfg.model_weights.catboost * cbm_oof)
     ensemble_auc = roc_auc_score(y_train, ensemble_oof_preds)
 
     logger.info(f"XGBoost OOF AUC: {roc_auc_score(y_train, xgb_oof):.5f}")
     logger.info(f"CatBoost OOF AUC: {roc_auc_score(y_train, cbm_oof):.5f}")
-    logger.info(
-        f"Final Ensemble AUC ({cfg.model_weights.xgboost * 100:.0f}/{cfg.model_weights.catboost * 100:.0f}): {ensemble_auc:.5f}"
-    )
+
+    xgb_w = cfg.model_weights.xgboost * 100
+    cbm_w = cfg.model_weights.catboost * 100
+    logger.info(f"Final Ensemble AUC ({xgb_w:.0f}/{cbm_w:.0f}): {ensemble_auc:.5f}")
 
     threshold = cfg.threshold
     y_pred_binary = (ensemble_oof_preds > threshold).astype(int)
@@ -70,18 +67,14 @@ def evaluate_models(cfg: DictConfig, logger):
         xgb_model = joblib.load(os.path.join(SAVE_PATH, "xgb_model_pipeline.pkl"))
         cbm_model = joblib.load(os.path.join(SAVE_PATH, "cbm_model_pipeline.pkl"))
 
-        df_sample = pd.read_csv(os.path.join(SOURCE, "train.csv")).sample(
-            2000, random_state=cfg.training.random_seed
-        )
+        df_sample = pd.read_csv(os.path.join(SOURCE, "train.csv")).sample(2000, random_state=cfg.training.random_seed)
         X_sample = df_sample.drop(columns=["TARGET", "SK_ID_CURR"], errors="ignore")
         y_sample = df_sample["TARGET"]
 
         def ensemble_predict_fixed(X):
             x_probs = xgb_model.predict_proba(X)[:, 1]
             c_probs = cbm_model.predict_proba(X)[:, 1]
-            return (cfg.model_weights.xgboost * x_probs) + (
-                cfg.model_weights.catboost * c_probs
-            )
+            return (cfg.model_weights.xgboost * x_probs) + (cfg.model_weights.catboost * c_probs)
 
         logger.info("Calculating Permutation Importance (Sampling 2000 rows)...")
         results = permutation_importance(
@@ -118,9 +111,7 @@ def evaluate_models(cfg: DictConfig, logger):
     final_summary = {
         "ensemble_auc": float(ensemble_auc),
         "threshold": threshold,
-        "classification_report": classification_report(
-            y_train, y_pred_binary, output_dict=True
-        ),
+        "classification_report": classification_report(y_train, y_pred_binary, output_dict=True),
     }
     with open(os.path.join(REPORT_PATH, "final_summary.json"), "w") as f:
         json.dump(final_summary, f, indent=4)

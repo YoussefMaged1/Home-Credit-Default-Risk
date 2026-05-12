@@ -99,11 +99,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         required=True,
         choices=[*STAGE_SCRIPTS.keys(), "all", "pipeline"],
-        help=(
-            "Pipeline mode to run. "
-            "'all' runs every stage sequentially. "
-            "'pipeline' uses DVC (dvc repro)."
-        ),
+        help=("Pipeline mode to run. 'all' runs every stage sequentially. 'pipeline' uses DVC (dvc repro)."),
     )
     return parser.parse_args()
 
