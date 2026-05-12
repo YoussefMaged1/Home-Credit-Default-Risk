@@ -196,3 +196,5 @@ reports/*/*.pdf
 reports/*/*.html
 reports/*/*.txt
 /models
+
+/catboost_info

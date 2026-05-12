@@ -10,6 +10,13 @@ from dotenv import load_dotenv
 from omegaconf import OmegaConf
 from pydantic import BaseModel
 
+from src.training.process_data import (
+    apply_feature_engineering,
+    get_bureau_features,
+    get_installments_features,
+    get_prev_apps_features,
+)
+
 
 class ApplicantFeatures(BaseModel):
     SK_ID_CURR: Optional[int] = None
@@ -167,66 +174,13 @@ class HomeCreditAPI(ls.LitAPI):
         RAW = "data/raw"
 
         bureau = pd.read_csv(os.path.join(RAW, "bureau.csv"))
-        bureau_agg = bureau.groupby("SK_ID_CURR").agg(
-            {
-                "DAYS_CREDIT": ["mean", "max", "min"],
-                "DAYS_CREDIT_ENDDATE": ["mean"],
-                "AMT_CREDIT_SUM": ["mean", "sum"],
-                "AMT_CREDIT_SUM_DEBT": ["mean", "sum"],
-                "AMT_CREDIT_MAX_OVERDUE": ["mean"],
-                "CNT_CREDIT_PROLONG": ["sum"],
-            }
-        )
-        bureau_agg.columns = pd.Index(
-            ["BUREAU_" + e[0] + "_" + e[1].upper() for e in bureau_agg.columns.tolist()]
-        )
-        bureau_agg["BUREAU_DEBT_CREDIT_RATIO"] = bureau_agg[
-            "BUREAU_AMT_CREDIT_SUM_DEBT_SUM"
-        ] / (bureau_agg["BUREAU_AMT_CREDIT_SUM_SUM"] + 1e-6)
-        bureau_agg["BUREAU_LOAN_COUNT"] = bureau.groupby("SK_ID_CURR").size()
-        self.bureau_df = bureau_agg.reset_index()
+        self.bureau_df = get_bureau_features(bureau)
 
         prev = pd.read_csv(os.path.join(RAW, "previous_application.csv"))
-        prev_agg = prev.groupby("SK_ID_CURR").agg(
-            {
-                "AMT_ANNUITY": ["mean", "max"],
-                "AMT_APPLICATION": ["mean", "max"],
-                "AMT_CREDIT": ["mean", "max"],
-                "AMT_DOWN_PAYMENT": ["mean", "max"],
-                "DAYS_DECISION": ["mean", "max"],
-                "CNT_PAYMENT": ["mean", "sum"],
-            }
-        )
-        prev_agg.columns = pd.Index(
-            ["PREV_" + e[0] + "_" + e[1].upper() for e in prev_agg.columns.tolist()]
-        )
-        prev_agg["PREV_APPROVED_COUNT"] = (
-            prev[prev["NAME_CONTRACT_STATUS"] == "Approved"]
-            .groupby("SK_ID_CURR")
-            .size()
-        )
-        prev_agg["PREV_REFUSED_COUNT"] = (
-            prev[prev["NAME_CONTRACT_STATUS"] == "Refused"].groupby("SK_ID_CURR").size()
-        )
-        prev_agg = prev_agg.fillna(0)
-        self.prev_df = prev_agg.reset_index()
+        self.prev_df = get_prev_apps_features(prev)
 
         ins = pd.read_csv(os.path.join(RAW, "installments_payments.csv"))
-        ins["PAYMENT_DIFF"] = ins["AMT_INSTALMENT"] - ins["AMT_PAYMENT"]
-        ins["DPD"] = ins["DAYS_ENTRY_PAYMENT"] - ins["DAYS_INSTALMENT"]
-        ins["DPD"] = ins["DPD"].apply(lambda x: x if x > 0 else 0)
-        ins_agg = ins.groupby("SK_ID_CURR").agg(
-            {
-                "PAYMENT_DIFF": ["mean", "max", "sum"],
-                "DPD": ["mean", "max", "sum"],
-                "AMT_PAYMENT": ["mean", "sum"],
-                "DAYS_ENTRY_PAYMENT": ["max", "mean"],
-            }
-        )
-        ins_agg.columns = pd.Index(
-            ["INS_" + e[0] + "_" + e[1].upper() for e in ins_agg.columns.tolist()]
-        )
-        self.ins_df = ins_agg.reset_index()
+        self.ins_df = get_installments_features(ins)
 
     def decode_request(self, request: PredictRequest):
         df = pd.DataFrame([a.model_dump() for a in request.applicants])
@@ -237,37 +191,8 @@ class HomeCreditAPI(ls.LitAPI):
         df = df.merge(self.prev_df, on="SK_ID_CURR", how="left")
         df = df.merge(self.ins_df, on="SK_ID_CURR", how="left")
         df = df.drop(columns=["SK_ID_CURR"], errors="ignore")
-        df = self._apply_feature_engineering(df)
+        df = apply_feature_engineering(df)
 
-        return df
-
-    def _apply_feature_engineering(self, df: pd.DataFrame) -> pd.DataFrame:
-        df = df.copy()
-        df["ANNUITY_INCOME_PERC"] = df["AMT_ANNUITY"] / df["AMT_INCOME_TOTAL"]
-        df["PAYMENT_RATE"] = df["AMT_ANNUITY"] / df["AMT_CREDIT"]
-        df["INCOME_CREDIT_PERC"] = df["AMT_INCOME_TOTAL"] / df["AMT_CREDIT"]
-        df["INCOME_PER_PERSON"] = df["AMT_INCOME_TOTAL"] / df["CNT_FAM_MEMBERS"]
-        df["DAYS_EMPLOYED_PERC"] = df["DAYS_EMPLOYED"] / df["DAYS_BIRTH"]
-        df["EXT_SOURCES_PROD"] = (
-            df["EXT_SOURCE_1"] * df["EXT_SOURCE_2"] * df["EXT_SOURCE_3"]
-        )
-        df["EXT_SOURCES_STD"] = df[
-            ["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3"]
-        ].std(axis=1)
-        df["CREDIT_ANNUITY_RATIO"] = df["AMT_CREDIT"] / df["AMT_ANNUITY"]
-        df["CREDIT_GOODS_RATIO"] = df["AMT_CREDIT"] / df["AMT_GOODS_PRICE"]
-        df["INCOME_ANNUITY_CHUNKS"] = df["AMT_INCOME_TOTAL"] / df["AMT_ANNUITY"]
-        df["CREDIT_DOWNPAYMENT"] = df["AMT_GOODS_PRICE"] - df["AMT_CREDIT"]
-        df["EMPLOYED_AGE_RATIO"] = df["DAYS_EMPLOYED"] / df["DAYS_BIRTH"]
-        df["AGE_INT"] = (df["DAYS_BIRTH"] / -365).astype(int)
-        df["EXT_SOURCE_1_OVER_3"] = df["EXT_SOURCE_1"] / (df["EXT_SOURCE_3"] + 1e-6)
-        df["EXT_SOURCE_2_OVER_3"] = df["EXT_SOURCE_2"] / (df["EXT_SOURCE_3"] + 1e-6)
-        df["EXT_SOURCES_SUM"] = df[
-            ["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3"]
-        ].sum(axis=1)
-        df["EXT_SOURCES_MEAN"] = df[
-            ["EXT_SOURCE_1", "EXT_SOURCE_2", "EXT_SOURCE_3"]
-        ].mean(axis=1)
         return df
 
     def predict(self, df: pd.DataFrame):
@@ -281,7 +206,7 @@ class HomeCreditAPI(ls.LitAPI):
         for i, score in enumerate(preds):
             record = {
                 "default_probability": round(float(score), 4),
-                "prediction": "DEFAULT" if score > self.threshold else "NO DEFAULT",
+                "prediction": "NO DEFAULT" if score > self.threshold else "DEFAULT",
             }
             if self.sk_ids:
                 record["SK_ID_CURR"] = int(self.sk_ids[i])

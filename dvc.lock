@@ -31,8 +31,8 @@ stages:
       nfiles: 10
     - path: src/training/process_data.py
       hash: md5
-      md5: 8dcd750a665863b59e5af83dc1833a5b
-      size: 6563
+      md5: e9d04aee4d58059b2434a5af410103d6
+      size: 6135
     outs:
     - path: data/processed/test.csv
       hash: md5
